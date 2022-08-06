@@ -9,6 +9,7 @@ file = f'PKO_{MONTH}.csv'
 def pko_finance(file):
     transactions = []
     all_categories = []
+    # fetching transaction data 
     with open(file, encoding="utf8", errors='ignore', mode='r') as csv_file:
         csv_reader = csv.reader(csv_file)
         for i in csv_reader:
@@ -28,6 +29,7 @@ def pko_finance(file):
     wsheet = sh.worksheet(f'{MONTH}') 
     wsheet.batch_clear(['A6:C1000'])
 
+    # inserting transactions with use of sleep due to API limitations
     for i in transactions:
         wsheet.insert_rows([i],6)
         time.sleep(1.5)
@@ -37,6 +39,7 @@ def pko_finance(file):
 def finance_summary(file):
     expenses = []
     income = []
+    # fetching data to create a list for expenses and incomes
     with open(file, encoding="utf8", errors='ignore', mode='r') as csv_file:
         csv_reader = csv.reader(csv_file)
         for i in csv_reader:
@@ -54,6 +57,8 @@ def finance_summary(file):
 
     wsheet = sh.worksheet(f'{MONTH}') 
     
+    # Creating sums of data to update spreadsheet cells
+    
     sum_of_expenses = sum(expenses)
     sum_of_income = sum(income)
     total = sum_of_income+sum_of_expenses
@@ -67,7 +72,7 @@ def finance_summary(file):
 def finance_breakdown(file):
     transactions = []
     all_categories = []   
-    #opening the file and creating transaction data
+    # opening the file and creating transaction data
     with open(file, encoding="utf8", errors='ignore', mode='r') as csv_file:
         csv_reader = csv.reader(csv_file)
         for i in csv_reader:
@@ -84,19 +89,19 @@ def finance_breakdown(file):
     categories = []
     new_dict = {}
     
-    #removing duplicates from all_categories
+    # removing duplicates from all_categories
     [categories.append(i) for i in all_categories if i not in categories]
     
     #creating dictionary 
     for i in categories:
         new_dict[i] = []
         
-    #adding all transactions sum for each category
+    # adding all transactions sum for each category
     for i in transactions:
         if i[0] in new_dict.keys():
             new_dict[i[0]].append(i[1])
             
-    #creating the sums for categories
+    # creating the sums for categories
     for i in new_dict:
         new_dict.update({i:sum(new_dict[i])})
         
@@ -106,7 +111,7 @@ def finance_breakdown(file):
     wsheet = sh.worksheet(f'{MONTH}') 
     
     wsheet.batch_clear(['E1:Z2'])
-    #updating cells with categories and values
+    # updating cells with categories and values
     for idx,v in enumerate(new_dict.items()):
         my_values = list(v)
         wsheet.update_cell(1,idx+5,my_values[0])
